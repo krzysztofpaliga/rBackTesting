@@ -10,21 +10,20 @@ require(odbc)
 require(lubridate)
 '%ni%' <- Negate('%in%')
 connection <- DBI::dbConnect(odbc::odbc(), "cryptonoise")
-table <- tbl(connection, "bittrex_btc_minutely")
+datA <- tbl(connection, "bittrex_btc_minutely")
 
-table  %>% collect() -> dataHistorical
+connection <- DBI::dbConnect(odbc::odbc(), "cryptonoi.se")
+datA <- tbl(connection, "cryptocompare_bittrex_minutely")
+
+datA %>%  collect() -> dataHistorical
+#datA %>%  collect() -> dataHistorical
 
 rQuant <- init_rQuant()
 
 dataHistorical$time <- dataHistorical$time / 1000
-
 dataHistorical$floor <- floor((dataHistorical$time %/% (5 * 60)) * (5 * 60))
 
-dataHistoricalAll <- dataHistorical %>% filter(type=="all")
-dataHistoricalBuy <- dataHistorical %>% filter(type=="BUY")
-dataHistoricalSell <- dataHistorical %>% filter(type=="SELL")
-
-dataHistorical <- dataHistoricalAll %>%
+dataHistorical <- dataHistorical %>%
   group_by(coin, floor) %>%
   summarize(time = first(time),
             open = first(open),
@@ -59,22 +58,21 @@ desc <- function(a) {
 mean <- mean(data$open)
 data$fd <- rollapply(data$close, width=2, FUN = fd, fill = NA, align = "right")
 data$ascSell <- rollapply(data$fd, width=5, FUN = asc, fill = NA, align = "right")
+nrow(filter(data, asc==TRUE))
 data$ascBuy <- rollapply(data$fd, width=10, FUN = desc, fill = NA, align = "right" )
+nrow(filter(data, desc ==TRUE))
 data %>% mutate(green <- close > open) -> data
 #data <- na.omit(data)
 
 windowSize = 12
 tradeBookCostRatio = 0
-binStrategy <- binStrategies$distributingMeanBinStrategy
+binStrategy <- binStrategies$simpleBinStrategy
 buyStrategy <- buyStrategies$cc$hammerBuyStrategy
 sellStrategy <- sellStrategies$cc$hammerSellStrategy
 numberOfBins = 50
 initialInvestment = 0.1
 
-
 bins <- win(data = data,
-            buy = dataHistoricalBuy,
-            sell = dataHistoricallSell,
             windowSize = windowSize,
             binStrategy = binStrategy,
             buyStrategy = buyStrategy,
@@ -82,5 +80,4 @@ bins <- win(data = data,
             tradeBookCostRatio = tradeBookCostRatio,
             numberOfBins = numberOfBins,
             initialInvestment = initialInvestment)
-
 

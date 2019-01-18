@@ -8,25 +8,27 @@ require(tidyverse)
 require(dplyr)
 require(odbc)
 require(lubridate)
+require(anytime)
 '%ni%' <- Negate('%in%')
-# connection <- DBI::dbConnect(odbc::odbc(), "cryptonoise")
-# data <- tbl(connection, "bittrex_btc_minutely")
-# data %>% collect() -> bittrex
+ connection <- DBI::dbConnect(odbc::odbc(), "cryptonoise")
+ data <- tbl(connection, "bittrex_btc_minutely")
+ data %>% collect() -> bittrex
 
-# bittrex %>% select(time) %>% distinct() %>% arrange(time) -> timestamps
-# for (i in 1:nrow(timestamps)) {
-#   print(anytime(timestamps[i,1]$time/1000))
-#   print(bittrex %>% filter(time == timestamps[i,1]$time) %>% count())
-# }
-#
-# bittrex %>% select(time) %>% max() -> oldest
-# bittrex %>% filter(time == oldest) %>% group_by(coin) %>% count()
-#
-# while (TRUE) {
-#   data %>% filter(coin == "ETH") %>% collect() -> a
-#   print(a)
-#   Sys.sleep(10)
-# }
+ bittrex %>% select(time) %>% distinct() %>% arrange(time) -> timestamps
+ for (i in 1:nrow(timestamps)) {
+   print(anytime(timestamps[i,1]$time/1000))
+   print(bittrex %>% filter(time == timestamps[i,1]$time) %>% count())
+ }
+
+bittrex %>% select(time) %>% max() -> oldest
+bittrex %>% filter(time == oldest) %>% group_by(coin) %>% count()
+
+while (TRUE) {
+  data %>% filter(coin == "ETH") %>% collect() -> a
+
+  print(a)
+  Sys.sleep(10)
+}
 
 
 asc <- function(a) {

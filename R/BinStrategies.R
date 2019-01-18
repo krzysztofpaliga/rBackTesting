@@ -58,7 +58,7 @@ binStrategies$simpleBinStrategy$buy <-
         }
 
         bins[bins$binIndex == slotBinIndex, ]$coin = tbbCoin
-        bins[bins$binIndex == slotBinIndex, ]$amount = (bins[bins$binIndex == slotBinIndex, ]$investmentHeight * 0.998) / (tbbOpen * 1.02)
+        bins[bins$binIndex == slotBinIndex, ]$amount = (bins[bins$binIndex == slotBinIndex, ]$investmentHeight * 0.998) / (tbbOpen * 1)
         bins[bins$binIndex == slotBinIndex, ]$price = tbbOpen
         bins[bins$binIndex == slotBinIndex, ]$time = tbbTime
 
@@ -70,15 +70,12 @@ binStrategies$simpleBinStrategy$buy <-
         lbcPrice <- latestBoughtCoin$price
         lbcValue <- lbcPrice * lbcAmount
 
-        # transactionHistory <- transactionHistory %>%
-        #  add_row(
-        #    coin = lbcCoin,
-        #    date = anytime(lbcTimestamp),
-        #    amount = lbcAmount,
-        #    price = lbcPrice,
-        #    value = lbcValue,
-        #    type = "buy"
-        #  )
+        transactionHistory <- transactionHistory %>%
+         add_row(
+           coin = lbcCoin,
+           amount = lbcAmount,
+           type = "buy"
+         )
       }
       if (verbose) {
         print("#### bins aftery buy")
@@ -119,16 +116,15 @@ binStrategies$simpleBinStrategy$sell <-
             break
           }
           bins[bins$binIndex == slotBinIndex, ]$investmentHeight <-
-             bins[bins$binIndex == slotBinIndex, ]$amount * coinToBeSold$close * 0.998 * 0.98
+             bins[bins$binIndex == slotBinIndex, ]$amount * coinToBeSold$close * 0.998
           bins[bins$binIndex == slotBinIndex, ]$coin = NA
           bins[bins$binIndex == slotBinIndex, ]$amount = NA
           bins[bins$binIndex == slotBinIndex, ]$price = NA
 
-          #transactionHistory <- transactionHistory %>%
+          # transactionHistory <- transactionHistory %>%
           # add_row(
-          #    coin = toBeSold$coin,
-          #    date = toBeSold$time,
-          #    value = latestSoldCoin$investmentHeight,
+          #    coin = coinToBeSold$coin,
+          #    amount = 1.0,
           #    type = "sell"
           #  )
         }

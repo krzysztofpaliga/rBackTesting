@@ -1,5 +1,7 @@
 win <-
   function(data,
+           buy,
+           sell,
            windowSize,
            tradeBookCostRatio,
            binStrategy,
@@ -10,11 +12,8 @@ win <-
 
     transactionHistory <-
       data_frame(
-        date = as.POSIXct(character()),
         coin = character(),
         amount = double(),
-        price = double(),
-        value = double(),
         type = character()
       )
 
@@ -39,7 +38,9 @@ win <-
 
       toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTime, bins, verbose = FALSE)
 
-      returned <- binStrategy$sell(toBeSold, bins = bins, wallet, transactionHistory, verbose = FALSE)
+      toBeSoldSell <- sell %>% filter(time == pointInTime, coin %in% toBeSold$coin)
+
+      returned <- binStrategy$sell(toBeSoldSell, bins = bins, wallet, transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
       wallet <- returned[[2]]
       transactionHistory <- returned[[3]]
@@ -50,7 +51,9 @@ win <-
 
       toBeBought <- buyStrategy$copyWhatIsTeBeBought(dataAtPointInTime = dataAtPointInTime, verbose = FALSE)
 
-      returned <- binStrategy$buy(toBeBought = toBeBought, bins = bins, wallet = wallet, transactionHistory = transactionHistory, verbose = FALSE)
+      toBeBoughtBuy <- buy %>% filter(time == poinInTime, coin %in% toBeBought$coin)
+
+      returned <- binStrategy$buy(toBeBought = toBeBoughtBuy, bins = bins, wallet = wallet, transactionHistory = transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
       wallet <- returned[[2]]
       transactionHistory <- returned[[3]]
@@ -82,7 +85,7 @@ win <-
     print(paste("held cash ", currentlyHeldCash))
     print(bins)
     print(paste("investment height ", sum(bins$investmentHeight)))
-    return(bins)
+    return(transactionHistory)
   }
 
 winRollingWindow <-
