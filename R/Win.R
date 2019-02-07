@@ -1,7 +1,5 @@
 win <-
   function(data,
-           buy,
-           sell,
            windowSize,
            tradeBookCostRatio,
            binStrategy,
@@ -38,9 +36,7 @@ win <-
 
       toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTime, bins, verbose = FALSE)
 
-      toBeSoldSell <- sell %>% filter(time == pointInTime, coin %in% toBeSold$coin)
-
-      returned <- binStrategy$sell(toBeSoldSell, bins = bins, wallet, transactionHistory, verbose = FALSE)
+      returned <- binStrategy$sell(toBeSold, bins = bins, wallet, transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
       wallet <- returned[[2]]
       transactionHistory <- returned[[3]]
@@ -51,9 +47,7 @@ win <-
 
       toBeBought <- buyStrategy$copyWhatIsTeBeBought(dataAtPointInTime = dataAtPointInTime, verbose = FALSE)
 
-      toBeBoughtBuy <- buy %>% filter(time == poinInTime, coin %in% toBeBought$coin)
-
-      returned <- binStrategy$buy(toBeBought = toBeBoughtBuy, bins = bins, wallet = wallet, transactionHistory = transactionHistory, verbose = FALSE)
+      returned <- binStrategy$buy(toBeBought = toBeBought, bins = bins, wallet = wallet, transactionHistory = transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
       wallet <- returned[[2]]
       transactionHistory <- returned[[3]]

@@ -1,7 +1,7 @@
-source("~/Develop/R/rTrade/R/BinStrategies.R")
-source("~/Develop/R/rTrade/R/BuyStrategies.R")
-source("~/Develop/R/rTrade/R/SellStrategies.R")
-source("~/Develop/R/rTrade/R/Win.R")
+source("~/Develop/R/rBackTesting/R/BinStrategies.R")
+source("~/Develop/R/rBackTesting/R/BuyStrategies.R")
+source("~/Develop/R/rBackTesting/R/SellStrategies.R")
+source("~/Develop/R/rBackTesting/R/Win.R")
 require(rChange)
 require(rQuant)
 require(tidyverse)
@@ -9,15 +9,15 @@ require(dplyr)
 require(odbc)
 require(lubridate)
 '%ni%' <- Negate('%in%')
-connection <- DBI::dbConnect(odbc::odbc(), "cryptonoi.se")
+connection <- DBI::dbConnect(odbc::odbc(), "cryptocompare")
 #datA <- tbl(connection, "cryptocompare_histoDay")
-datA <- tbl(connection, "cryptocompare_bittrex_daily")
+datA <- tbl(connection, "binance_day")
 #datA %>% filter(time>1529533355) %>%  collect() -> dataHistorical
 #datA %>%  filter(exchange == "Cryptopia", currency == "BTC") %>% distinct() %>% collect() -> dataHistorical
 datA %>%  filter(exchange == "Bittrex", currency == "BTC") %>% distinct() %>% collect() -> dataHistorical
 #datA %>%  filter(exchange == "Cryptopia", currency=="BTC") %>% distinct() %>% collect() -> dataHistorical
 
-dataHistorical %>% filter(time > 1536431436) -> dataHistoricalF
+datA %>% filter(time > 1546360576) %>% collect()-> dataHistoricalF
 
 rQuant <- init_rQuant()
 
@@ -36,10 +36,10 @@ asc <- function(a) {
   return(allAsc)
 }
 
-data$asc <- rollapply(data$open, width=2, FUN = asc, fill = NA, align = "right")
-data$desc <- rollapply(data$open, width=3, FUN = asc, fill = NA, align = "right" )
+data$ascSell <- rollapply(data$open, width=2, FUN = asc, fill = NA, align = "right")
+data$ascBuy <- rollapply(data$open, width=3, FUN = asc, fill = NA, align = "right" )
 
-#data <- na.omit(data)
+data <- na.omit(data)
 
 windowSize = 12
 tradeBookCostRatio = 0
