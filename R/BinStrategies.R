@@ -58,7 +58,7 @@ binStrategies$simpleBinStrategy$buy <-
         }
 
         bins[bins$binIndex == slotBinIndex, ]$coin = tbbCoin
-        bins[bins$binIndex == slotBinIndex, ]$amount = (bins[bins$binIndex == slotBinIndex, ]$investmentHeight * 0.998) / (tbbOpen * 1)
+        bins[bins$binIndex == slotBinIndex, ]$amount = (bins[bins$binIndex == slotBinIndex, ]$investmentHeight * 0.998) / (tbbClose* 1)
         bins[bins$binIndex == slotBinIndex, ]$price = tbbOpen
         bins[bins$binIndex == slotBinIndex, ]$time = tbbTime
 
@@ -152,8 +152,12 @@ binStrategies$distributingMeanBinStrategy$adjustBins <-
     meanInvestmentHeight <- mean(filter(bins, is.na(coin))$investmentHeight)
 
     binsNA <- bins %>%
-      filter(is.na(coin)) %>%
-      mutate(investmentHeight = meanInvestmentHeight)
+      filter(is.na(coin))
+
+    if (nrow(binsNA) > 0) {
+      binsNA <- binsNA %>%
+        mutate(investmentHeight = meanInvestmentHeight)
+    }
 
     binsCoin <- bins %>%
       filter(!is.na(coin))

@@ -6,7 +6,8 @@ win <-
            buyStrategy,
            sellStrategy,
            numberOfBins,
-           initialInvestment) {
+           initialInvestment,
+           prophet) {
 
     transactionHistory <-
       data_frame(
@@ -24,17 +25,17 @@ win <-
 
     bins <- binStrategy$initBins(numberOfBins, initialInvestment)
 
-    pointsInTime <- distinct(data, time) %>% ungroup() %>% distinct(time) %>% arrange()
+    pointsInTime <- distinct(data, time) %>% ungroup() %>% distinct(time) %>% arrange(time)
 
     for (pointInTimeRowNumber in 1:nrow(pointsInTime)) {
-      #pointInTimeRowNumber = 521
+    #  pointInTimeRowNumber = 1
       print(paste("poin in time ", pointInTimeRowNumber))
       print(paste("held investment ", sum(bins$investmentHeight)))
       pointInTime <- pointsInTime[pointInTimeRowNumber, ]$time
 
       dataAtPointInTime <- filter(data, time == pointInTime)
 
-      toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTime, bins, verbose = FALSE)
+      toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTime, prophet, bins, verbose = FALSE)
 
       returned <- binStrategy$sell(toBeSold, bins = bins, wallet, transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
@@ -45,7 +46,7 @@ win <-
       bins <- returned[[1]]
       wallet <- returned[[2]]
 
-      toBeBought <- buyStrategy$copyWhatIsTeBeBought(dataAtPointInTime = dataAtPointInTime, verbose = FALSE)
+      toBeBought <- buyStrategy$copyWhatIsTeBeBought(dataAtPointInTime = dataAtPointInTime, prophet, verbose = FALSE)
 
       returned <- binStrategy$buy(toBeBought = toBeBought, bins = bins, wallet = wallet, transactionHistory = transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
@@ -55,7 +56,7 @@ win <-
 
     currentlyHeldCash <- 0
     currentlyHeldInvestment <- 0
-    lastTimestamp <- pointsInTime[nrow(pointsInTime), ]$time
+    lastTimestamp <- pointsInTime[nrow(pointsInTime), ]
     lastDaysData <- filter(data, time == lastTimestamp)
     for (i in 1:nrow(bins)) {
       print(paste("i ", i))
@@ -145,7 +146,7 @@ winRollingWindow <-
 
     currentlyHeldCash <- 0
     currentlyHeldInvestment <- 0
-    lastTimestamp <- pointsInTime[nrow(pointsInTime), ]$time
+    lastTimestamp <- pointsInTime[nrow(pointsInTime), ]
     lastDaysData <- filter(data, time == lastTimestamp)
     for (i in 1:nrow(bins)) {
       print(paste("i ", i))

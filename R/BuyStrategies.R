@@ -15,6 +15,7 @@ buyStrategies$cc$hammerBuyStrategy$copyWhatIsTeBeBought <- function(dataAtPointI
     arrange(desc(csLShadow), csUShadow, csBody) %>%
     select(coin, open, close, high, low, time)
 
+
   if (verbose && nrow(toBeBought) > 0) {
     print(toBeBought)
   }
