@@ -13,7 +13,7 @@ require(lubridate)
 require(zoo)
 require(prophet)
 rData <- init_rData()
-dat <- rData$cryptoCompare$getAllCoinsHisto(histoFunction = rData$cryptoCompare$API$histoDay, exchange="Binance", currency="BTC")
+dat <- rData$cryptoCompare$getAllCoinsHisto(histoFunction = rData$cryptoCompare$API$histoDay, exchange="Binance", currency="BNB")
 '%ni%' <- Negate('%in%')
 #connection <- DBI::dbConnect(odbc::odbc(), "cryptocompare")
 #datA <- tbl(connection, "cryptocompare_histoDay")
@@ -58,7 +58,7 @@ tradeBookCostRatio = 0
 binStrategy <- binStrategies$distributingMeanBinStrategy
 buyStrategy <- buyStrategies$prophet$buyUndervalued
 sellStrategy <- sellStrategies$prophet$sellOvervalued
-numberOfBins = 25
+numberOfBins = 3
 initialInvestment = 1
 
 bins <- win(data = data,
