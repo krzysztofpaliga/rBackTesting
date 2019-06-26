@@ -53,7 +53,7 @@ binStrategies$simpleBinStrategy$buy <-
         if (nrow(slotBinIndex) > 0) {
           slotBinIndex <- slotBinIndex[1, ]$binIndex
         } else {
-          # print(paste("missing slot for ", tbbCoin))
+          print(paste("missing slot for ", tbbCoin))
           next
         }
 

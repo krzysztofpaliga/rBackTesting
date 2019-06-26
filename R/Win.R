@@ -1,13 +1,12 @@
 win <-
   function(data,
-           windowSize,
+           objs,
            tradeBookCostRatio,
            binStrategy,
            buyStrategy,
            sellStrategy,
            numberOfBins,
-           initialInvestment,
-           prophet) {
+           initialInvestment) {
 
     transactionHistory <-
       data_frame(
@@ -20,22 +19,19 @@ win <-
     wallet$reserveFund <- 0
     wallet$currentlyHeldReturn <- 0
 
-
-    meanCN <- paste("avg", windowSize, sep="_")
-
     bins <- binStrategy$initBins(numberOfBins, initialInvestment)
 
     pointsInTime <- distinct(data, time) %>% ungroup() %>% distinct(time) %>% arrange(time)
 
     for (pointInTimeRowNumber in 1:nrow(pointsInTime)) {
-    #  pointInTimeRowNumber = 1
+      #pointInTimeRowNumber = 1
       print(paste("poin in time ", pointInTimeRowNumber))
       print(paste("held investment ", sum(bins$investmentHeight)))
-      pointInTime <- pointsInTime[pointInTimeRowNumber, ]$time
+      pointInTime <- pointsInTime[pointInTimeRowNumber, ]
 
       dataAtPointInTime <- filter(data, time == pointInTime)
 
-      toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTime, prophet, bins, verbose = FALSE)
+      toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTime, objs, bins, verbose = FALSE)
 
       returned <- binStrategy$sell(toBeSold, bins = bins, wallet, transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
@@ -46,7 +42,7 @@ win <-
       bins <- returned[[1]]
       wallet <- returned[[2]]
 
-      toBeBought <- buyStrategy$copyWhatIsTeBeBought(dataAtPointInTime = dataAtPointInTime, prophet, verbose = FALSE)
+      toBeBought <- buyStrategy$copyWhatIsToBeBought(dataAtPointInTime = dataAtPointInTime, objs = objs, bins = bins, verbose = FALSE)
 
       returned <- binStrategy$buy(toBeBought = toBeBought, bins = bins, wallet = wallet, transactionHistory = transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
@@ -125,7 +121,7 @@ winRollingWindow <-
       dataAtPointInTimeBuy <- filter(dataBuy, time == pointInTime)
       dataAtPointInTimeSell <- filter(dataSell, time == pointInTime)
 
-      toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTimeSell, bins, verbose = FALSE)
+      toBeSold <- sellStrategy$copyWhatIsToBeSold(dataAtPointInTimeSell, objs, bins, verbose = FALSE)
 
       returned <- binStrategy$sell(toBeSold, bins = bins, wallet, transactionHistory, verbose = FALSE)
       bins <- returned[[1]]
